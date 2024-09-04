@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/class_models/fruit_model.dart';
 import 'package:fruit_shop/class_models/sale_model.dart';
 import 'package:fruit_shop/screens/sales_hist_det.dart';
@@ -20,9 +21,12 @@ class StockHistoryTile extends StatelessWidget {
         contentPadding: EdgeInsets.zero,
         title: Text(
           history.id,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
-        trailing: const Icon(Icons.keyboard_arrow_right));
+        trailing: Icon(
+          Icons.keyboard_arrow_right,
+          size: 25.sp,
+        ));
   }
 }
 
@@ -41,8 +45,11 @@ class SalesHistoryTile extends StatelessWidget {
         contentPadding: EdgeInsets.zero,
         title: Text(
           history.id,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
-        trailing: const Icon(Icons.keyboard_arrow_right));
+        trailing: Icon(
+          Icons.keyboard_arrow_right,
+          size: 25.sp,
+        ));
   }
 }

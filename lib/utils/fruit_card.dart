@@ -15,7 +15,7 @@ class FruitCard extends StatelessWidget {
       color: Theme.of(context).colorScheme.secondary,
       elevation: 5,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -24,8 +24,15 @@ class FruitCard extends StatelessWidget {
               child: AspectRatio(
                   aspectRatio: 1.0,
                   child: Image.asset(
-                    'assets/apple.png',
+                    fruitCardModel.stockImage,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.grey,
+                      child: Text(
+                        "No Image",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
                   )),
             ),
             Text(

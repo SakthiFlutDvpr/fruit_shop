@@ -12,8 +12,8 @@ class DataBaseConnection {
 
   Database? database;
 
-  String salesTable = "salesdetails";
-  String stockTable = "stockdetails";
+  static String salesTable = "salesdetails";
+  static String stockTable = "stockdetails";
   // String stockHistoryTable = "stockhistory";
   // String dailyHistoryTable = "dailyhistory";
 

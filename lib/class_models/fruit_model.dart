@@ -1,17 +1,19 @@
 class FruitModel {
   final String stockName;
-
+  final String stockImage;
   final double stockQuantity;
   final double investment;
 
   FruitModel(
       {required this.stockName,
+      required this.stockImage,
       required this.stockQuantity,
       required this.investment});
 
   factory FruitModel.fromJson(Map json) {
     return FruitModel(
         stockName: json['name'],
+        stockImage: json['image'],
         stockQuantity: json['quantity'],
         investment: json['investment']);
   }

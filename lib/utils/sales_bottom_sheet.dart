@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/class_models/sale_model.dart';
+import 'package:fruit_shop/constants/app_status.dart';
 import 'package:fruit_shop/constants/extensions.dart';
 import 'package:fruit_shop/controllers/home_controller.dart';
-import 'package:fruit_shop/network_services/sqlite_connectivity.dart';
+
 import 'package:fruit_shop/utils/filled_button.dart';
 import 'package:fruit_shop/utils/input_field.dart';
 import 'package:get/get.dart';
 
 class SalesBottomSheet extends StatelessWidget {
   SalesBottomSheet(
-      {super.key, required this.title, required this.homeController});
+      {super.key,
+      required this.title,
+      required this.homeController,
+      required this.quant});
   final String title;
 
   final HomeController homeController;
+  final double quant;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController saleQuantityController = TextEditingController();
   final TextEditingController salePriceController = TextEditingController();
@@ -66,6 +71,8 @@ class SalesBottomSheet extends StatelessWidget {
                 validator: (value) {
                   if (value.toString().isEmpty) {
                     return "Quantity Missing";
+                  } else if (double.parse(value.toString()) > quant) {
+                    return "insufficient quntity";
                   }
                   return null;
                 },
@@ -97,24 +104,29 @@ class SalesBottomSheet extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Expanded(
-                    child: UpdateButton(
+                  Expanded(child: Obx(() {
+                    return UpdateButton(
+                      loading: homeController.status.value == AppStatus.loading
+                          ? true
+                          : false,
                       text: "Update",
                       onTap: () async {
                         if (formKey.currentState!.validate()) {
+                          homeController.status.value = AppStatus.loading;
+                          SaleModel saleModel = SaleModel(
+                              name: title,
+                              quantity:
+                                  double.parse(saleQuantityController.text),
+                              price: double.parse(salePriceController.text));
                           try {
-                            debugPrint("======>>>>>> sales entry");
+                            debugPrint(">>>>>>>>>>>> sales entry");
 
-                            await homeController.updateSales(SaleModel(
-                                name: title,
-                                quantity:
-                                    double.parse(saleQuantityController.text),
-                                price: double.parse(salePriceController.text)));
-                          } catch (e) {
-                            debugPrint(
-                                ' ${e.toString()} error in sales updating');
+                            await homeController.updateSales(saleModel);
+                            debugPrint(">>>>>>>>>>>> sales entry");
+                          } catch (error) {
+                            debugPrint(error.toString());
                           }
-
+                          homeController.status.value = AppStatus.success;
                           saleQuantityController.clear();
                           salePriceController.clear();
                           Get.back();
@@ -122,8 +134,8 @@ class SalesBottomSheet extends StatelessWidget {
                       },
                       isDisable: false,
                       verticalPadding: 10.h,
-                    ),
-                  ),
+                    );
+                  })),
                 ],
               )
             ],

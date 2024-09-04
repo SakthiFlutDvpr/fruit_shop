@@ -9,9 +9,9 @@ class AppTheme {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: const Color(0xfff2f2f2),
         colorScheme: const ColorScheme.light(
-          primary: Color(0xff034703),
-          secondary: Color(0xffE5EEC3),
-        ),
+            primary: Color(0xff034703),
+            secondary: Color(0xffE5EEC3),
+            tertiary: Color(0xffE54444)),
         textTheme: TextTheme(
             headlineMedium: GoogleFonts.poppins(
               textStyle: TextStyle(

@@ -1,4 +1,5 @@
-import 'package:fruit_shop/network_services/sqlite_connectivity.dart';
+import 'package:fruit_shop/network_services/local_storage/sqlite_connectivity.dart';
+
 import 'package:sqflite/sqflite.dart';
 
 class SalesOperation {

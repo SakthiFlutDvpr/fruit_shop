@@ -45,6 +45,12 @@ class UpdateButton extends StatelessWidget {
               vertical: verticalPadding ?? 0,
               horizontal: horizontalPadding ?? 0);
         })),
-        child: Text(text));
+        child: loading != true
+            ? Text(text)
+            : const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              ));
   }
 }

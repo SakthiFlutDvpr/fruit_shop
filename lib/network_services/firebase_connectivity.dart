@@ -25,15 +25,31 @@ class FireStoreConnection {
         await stockCollection.doc(fruitCardModel.stockName).get();
 
     if (documentId.exists) {
-      await documentId.reference.update({
-        'quantity': fruitCardModel.stockQuantity,
-        'investment': fruitCardModel.investment
-      });
+      Map<String, dynamic> data = (documentId.data() as Map<String, dynamic>);
+      var quant = data['quantity'] + fruitCardModel.stockQuantity;
+      var invest = data['investment'] + fruitCardModel.investment;
+      await documentId.reference
+          .update({'quantity': quant, 'investment': invest});
     } else {
       await stockCollection.doc(fruitCardModel.stockName).set({
         'name': fruitCardModel.stockName,
+        'image': fruitCardModel.stockImage,
         'quantity': fruitCardModel.stockQuantity,
         'investment': fruitCardModel.investment
+      });
+    }
+  }
+
+  static Future<void> minusWithSales(SaleModel saleModel) async {
+    DocumentSnapshot documentId =
+        await stockCollection.doc(saleModel.name).get();
+
+    if (documentId.exists) {
+      Map<String, dynamic> data = (documentId.data() as Map<String, dynamic>);
+      var quant = data['quantity'] - saleModel.quantity;
+
+      await documentId.reference.update({
+        'quantity': quant,
       });
     }
   }
@@ -54,11 +70,12 @@ class FireStoreConnection {
     return data;
   }
 
-  static Future<Map> gettingSelectedStock(String document) async {
+  static Future<Map<String, dynamic>> gettingSelectedStock(
+      String document) async {
     DocumentSnapshot documentSnapshot =
         await stockCollection.doc(document).get();
 
-    return documentSnapshot.data() as Map;
+    return documentSnapshot.data() as Map<String, dynamic>;
   }
 
   static Future<void> deletingStocks() async {
@@ -67,6 +84,10 @@ class FireStoreConnection {
     for (final doc in querySnapshot.docs) {
       await doc.reference.delete();
     }
+  }
+
+  static Future<void> deletingSelectedStock(String document) async {
+    await stockCollection.doc(document).delete();
   }
 
   // sales collection operation >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -168,12 +189,30 @@ class FireStoreConnection {
     return data;
   }
 
+  static Future<void> deletingStocksHistory() async {
+    QuerySnapshot querySnapshot = await stockHistoryCollection.get();
+
+    for (final doc in querySnapshot.docs) {
+      await doc.reference.delete();
+    }
+  }
+
   // operation on collection saleshistory >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   static Future<void> addingSalesHistory(
       List<Map<String, dynamic>> salesItems) async {
     String document = DateTime.now().toString().substring(0, 10);
 
+    // DocumentSnapshot snapshot =
+    //     await salesHistoryCollection.doc(document).get();
+
+    // if (snapshot.exists) {
+    //   List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(
+    //       (snapshot.data() as Map<String, dynamic>)['salesItems']);
+    //   data.addAll(salesItems);
+    //   await snapshot.reference.update(
+    //       {'saleItems': data, 'date': Timestamp.fromDate(DateTime.now())});
+    // }
     await salesHistoryCollection.doc(document).set(
         {'saleItems': salesItems, 'date': Timestamp.fromDate(DateTime.now())});
   }
@@ -191,5 +230,13 @@ class FireStoreConnection {
       data.add(mapDatum);
     }
     return data;
+  }
+
+  static Future<void> deletingSalesHistory() async {
+    QuerySnapshot querySnapshot = await salesHistoryCollection.get();
+
+    for (final doc in querySnapshot.docs) {
+      await doc.reference.delete();
+    }
   }
 }

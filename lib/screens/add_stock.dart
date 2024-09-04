@@ -1,26 +1,49 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/class_models/fruit_model.dart';
+import 'package:fruit_shop/constants/app_status.dart';
 
 import 'package:fruit_shop/constants/extensions.dart';
 import 'package:fruit_shop/controllers/home_controller.dart';
+import 'package:fruit_shop/screens/image_pick_screen.dart';
 import 'package:fruit_shop/utils/app_bar_title.dart';
 import 'package:fruit_shop/utils/filled_button.dart';
 import 'package:fruit_shop/utils/input_field.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
-class AddStockScreen extends StatelessWidget {
-  AddStockScreen({super.key});
+class AddStockScreen extends StatefulWidget {
+  const AddStockScreen({super.key});
   static String name = "/add_stock_screen";
 
+  @override
+  State<AddStockScreen> createState() => _AddStockScreenState();
+}
+
+class _AddStockScreenState extends State<AddStockScreen> {
+  late HomeController homeController;
   final formKey = GlobalKey<FormState>();
+  Map? arg = Get.arguments;
 
-  final FocusNode focusNode = FocusNode();
+  late TextEditingController fruitNameController;
+  late TextEditingController fruitQuantityController;
+  late TextEditingController fruitInvestingController;
 
-  final ImagePicker imagePicker = ImagePicker();
+  @override
+  void initState() {
+    homeController = Get.find<HomeController>();
+    fruitNameController =
+        TextEditingController(text: arg != null ? arg!['name'] : '');
+    fruitQuantityController = TextEditingController();
+    fruitInvestingController = TextEditingController();
+    homeController.xFile.value = arg != null ? arg!['image'] : '';
+    homeController.imgColor.value = Colors.grey;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,26 +74,29 @@ class AddStockScreen extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Column(
                       children: [
-                        homeController.xFile != null
-                            ? SizedBox(
-                                width: 150.w,
-                                height: 125.h,
-                                child: Image.file(
-                                  File(homeController.xFile!.path),
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : CircleAvatar(
-                                radius: 85.r,
-                                backgroundColor: Colors.grey.shade400,
-                                child: Icon(
-                                  Icons.camera_alt_rounded,
-                                  size: 75.sp,
-                                )),
+                        Obx(() {
+                          return Container(
+                            height: 150.h,
+                            width: 150.w,
+                            decoration: BoxDecoration(
+                                color: Colors.grey.shade400,
+                                image: DecorationImage(
+                                    image: homeController.xFile.value.isNotEmpty
+                                        ? AssetImage(
+                                            homeController.xFile.value,
+                                          )
+                                        : const AssetImage(
+                                            "assets/camera.jpeg"),
+                                    fit: BoxFit.cover),
+                                shape: BoxShape.circle),
+                          );
+                        }),
                         SizedBox(
                           height: 10.h,
                         ),
-                        upLoadButton(homeController),
+                        Obx(() {
+                          return upLoadButton(homeController);
+                        })
                       ],
                     ),
                   ),
@@ -82,7 +108,7 @@ class AddStockScreen extends StatelessWidget {
                     height: 15.h,
                   ),
                   InputField(
-                    controller: homeController.fruitNameController,
+                    controller: fruitNameController,
                     inputType: TextInputType.name,
                     hintText: "E.g. Apple",
                     border: true,
@@ -103,7 +129,7 @@ class AddStockScreen extends StatelessWidget {
                     height: 15.h,
                   ),
                   InputField(
-                    controller: homeController.fruitQuantityController,
+                    controller: fruitQuantityController,
                     inputType: TextInputType.number,
                     hintText: "E.g. 100kg",
                     border: true,
@@ -124,7 +150,7 @@ class AddStockScreen extends StatelessWidget {
                     height: 15.h,
                   ),
                   InputField(
-                    controller: homeController.fruitInvestingController,
+                    controller: fruitInvestingController,
                     inputType: TextInputType.number,
                     hintText: "E.g. Rs.1000",
                     border: true,
@@ -142,44 +168,52 @@ class AddStockScreen extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Expanded(
-                        child: UpdateButton(
-                          text: "Update",
+                      Expanded(child: Obx(() {
+                        return UpdateButton(
+                          loading:
+                              homeController.status.value == AppStatus.loading
+                                  ? true
+                                  : false,
+                          text: "Add Stock",
                           onTap: () async {
-                            if (formKey.currentState!.validate()) {
-                              try {
-                                FruitModel fruitModel = FruitModel(
-                                    stockName:
-                                        homeController.fruitNameController.text,
-                                    stockQuantity: double.parse(homeController
-                                        .fruitQuantityController.text),
-                                    investment: double.parse(homeController
-                                        .fruitInvestingController.text));
+                            if (homeController.xFile.isNotEmpty) {
+                              if (formKey.currentState!.validate()) {
+                                homeController.status.value = AppStatus.loading;
+                                try {
+                                  FruitModel fruitModel = FruitModel(
+                                      stockImage: homeController.xFile.value,
+                                      stockName: fruitNameController.text
+                                          .toLowerCase(),
+                                      stockQuantity: double.parse(
+                                          fruitQuantityController.text),
+                                      investment: double.parse(
+                                          fruitInvestingController.text));
 
-                                debugPrint(
-                                    "object created success >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                                  await homeController.addStocks(fruitModel);
 
-                                await homeController.addStocks(fruitModel);
+                                  await homeController
+                                      .addStockHistory(fruitModel);
 
-                                await homeController
-                                    .addStockHistory(fruitModel);
-                                debugPrint(
-                                    "stock addedd success >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                              } catch (error) {
-                                debugPrint(
-                                    '${error.toString()} ????????????????????????????????????????????');
+                                  await homeController.getStocks();
+                                } catch (error) {
+                                  debugPrint(
+                                      '${error.toString()} ???????????????????');
+                                }
+                                homeController.status.value = AppStatus.success;
+                                fruitNameController.clear();
+                                fruitQuantityController.clear();
+                                fruitInvestingController.clear();
+                                homeController.xFile.value = '';
+                                Get.back();
                               }
-
-                              homeController.fruitNameController.clear();
-                              homeController.fruitQuantityController.clear();
-                              homeController.fruitInvestingController.clear();
-                              Get.back();
+                            } else {
+                              homeController.imgColor.value = Colors.red;
                             }
                           },
                           isDisable: false,
                           verticalPadding: 10.h,
-                        ),
-                      ),
+                        );
+                      })),
                     ],
                   )
                 ],
@@ -204,29 +238,19 @@ class AddStockScreen extends StatelessWidget {
   Widget upLoadButton(HomeController controller) {
     return OutlinedButton(
         onPressed: () async {
-          // ImagePicker imagePicker = ImagePicker();
-
-          // XFile? image =
-          //     await imagePicker.pickImage(source: ImageSource.gallery);
-
-          // if (image != null) {
-          //   controller.xFile = image;
-          //   debugPrint(image.path.toString());
-          // }
-
-          // debugPrint("image has not been picked");
+          Get.toNamed(ImagePickScreen.name);
         },
         style: OutlinedButton.styleFrom(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0),
-            side: const BorderSide(width: 1, color: Colors.grey),
+            side: BorderSide(width: 1, color: controller.imgColor.value),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8.r)))),
         child: Text(
-          "Upload From Gallery",
+          "Pick an Image",
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.bold,
-            color: Colors.grey,
+            color: controller.imgColor.value,
           ),
         ));
   }

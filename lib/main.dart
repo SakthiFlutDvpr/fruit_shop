@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
       designSize: const Size(375, 812),
       builder: (context, child) {
         return GetMaterialApp(
+          title: 'Gafur Shop',
           initialRoute: HomeScreen.name,
           getPages: AppRouter.getPages,
           unknownRoute: GetPage(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/class_models/fruit_model.dart';
@@ -23,17 +25,26 @@ class FruitCard extends StatelessWidget {
             Flexible(
               child: AspectRatio(
                   aspectRatio: 1.0,
-                  child: Image.asset(
-                    fruitCardModel.stockImage,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey,
-                      child: Text(
-                        "No Image",
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                  )),
+                  child: Image(
+                      fit: BoxFit.cover,
+                      image: FileImage(
+                          File(
+                            fruitCardModel.stockImage,
+                          ),
+                          scale: 1.0))
+                  //  Image.network(
+                  //   fruitCardModel.stockImage,
+                  //   fit: BoxFit.cover,
+                  //   errorBuilder: (context, error, stackTrace) => Container(
+                  //     color: Colors.grey,
+                  //     child: Text(
+                  //       "No Image",
+                  //       style: Theme.of(context).textTheme.bodyMedium,
+                  //     ),
+                  //   ),
+                  // )
+
+                  ),
             ),
             Text(
               fruitCardModel.stockName.capitalize.toString(),

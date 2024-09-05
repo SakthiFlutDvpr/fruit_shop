@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fruit_shop/constants/app_status.dart';
 import 'package:fruit_shop/constants/extensions.dart';
 import 'package:fruit_shop/controllers/home_controller.dart';
 import 'package:fruit_shop/network_services/firebase_connectivity.dart';
@@ -95,13 +96,13 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             Container(
-              height: 100.h,
-              padding: context.padding(),
+              margin: context.padding(),
               child: Row(
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
+                  Expanded(child: Obx(() {
+                    return OutlinedButton(
                         onPressed: () async {
+                          homeController.status.value = AppStatus.loading;
                           try {
                             //await FireStoreConnection.deletingSales();
                             await homeController.addSalesHistory();
@@ -109,24 +110,31 @@ class AppDrawer extends StatelessWidget {
                             debugPrint(error.toString());
                           }
                           await FireStoreConnection.deletingSales();
-
-                          Get.back();
+                          homeController.status.value = AppStatus.success;
                         },
                         style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                                width: 1, color: Colors.amber.shade800),
-                            shape: RoundedRectangleBorder(
+                            padding: EdgeInsets.symmetric(vertical: 5.h),
+                            side:
+                                const BorderSide(width: 1, color: Colors.black),
+                            shape: const RoundedRectangleBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(8.r)))),
-                        child: Text(
-                          "End Of Day",
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.amber.shade800,
-                          ),
-                        )),
-                  ),
+                                    BorderRadius.all(Radius.circular(0)))),
+                        child: homeController.status.value != AppStatus.loading
+                            ? Text(
+                                "End Of Day",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                              )
+                            : const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.black,
+                                ),
+                              ));
+                  })),
                 ],
               ),
             ),

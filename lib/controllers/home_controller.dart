@@ -41,6 +41,7 @@ class HomeController extends GetxController {
   addSalesHistory() async {
     List<Map<String, dynamic>> salesItems =
         await FireStoreConnection.gettingSales();
+
     await FireStoreConnection.addingSalesHistory(salesItems);
   }
 

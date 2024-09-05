@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/class_models/fruit_model.dart';
@@ -5,11 +7,11 @@ import 'package:fruit_shop/constants/app_status.dart';
 
 import 'package:fruit_shop/constants/extensions.dart';
 import 'package:fruit_shop/controllers/home_controller.dart';
-import 'package:fruit_shop/screens/image_pick_screen.dart';
 import 'package:fruit_shop/utils/app_bar_title.dart';
 import 'package:fruit_shop/utils/filled_button.dart';
 import 'package:fruit_shop/utils/input_field.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddStockScreen extends StatefulWidget {
   const AddStockScreen({super.key});
@@ -81,13 +83,17 @@ class _AddStockScreenState extends State<AddStockScreen> {
                             decoration: BoxDecoration(
                                 color: Colors.grey.shade400,
                                 image: DecorationImage(
-                                    image: homeController.xFile.value.isNotEmpty
-                                        ? AssetImage(
+                                  fit: BoxFit.cover,
+                                  image: homeController.xFile.value.isNotEmpty
+                                      ? FileImage(
+                                          File(
                                             homeController.xFile.value,
-                                          )
-                                        : const AssetImage(
-                                            "assets/camera.jpeg"),
-                                    fit: BoxFit.cover),
+                                          ),
+                                          scale: 1.0)
+                                      : const AssetImage(
+                                          "assets/camera.jpeg",
+                                        ),
+                                ),
                                 shape: BoxShape.circle),
                           );
                         }),
@@ -238,7 +244,15 @@ class _AddStockScreenState extends State<AddStockScreen> {
   Widget upLoadButton(HomeController controller) {
     return OutlinedButton(
         onPressed: () async {
-          Get.toNamed(ImagePickScreen.name);
+          ImagePicker imagePicker = ImagePicker();
+
+          XFile? file =
+              await imagePicker.pickImage(source: ImageSource.gallery);
+          if (file != null) {
+            homeController.xFile.value = file.path;
+          } else {
+            debugPrint('No Image');
+          }
         },
         style: OutlinedButton.styleFrom(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 0),

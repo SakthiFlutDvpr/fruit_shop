@@ -130,31 +130,43 @@ class SaleScreen extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: CupertinoColors.activeBlue),
                         )),
-                    TextButton(
-                        onPressed: () async {
-                          homeController.status.value = AppStatus.loading;
-                          try {
-                            homeController.deleteSelectedStock(stock);
-                          } catch (error) {
-                            debugPrint(error.toString());
-                          }
-                          homeController.status.value = AppStatus.success;
-                          Get.back();
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          "Remove",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      Theme.of(context).colorScheme.tertiary),
-                        )),
+                    Obx(() {
+                      return TextButton(
+                          onPressed: () async {
+                            homeController.status.value = AppStatus.loading;
+                            try {
+                              homeController.deleteSelectedStock(stock);
+                            } catch (error) {
+                              debugPrint(error.toString());
+                            }
+
+                            Get.back();
+                            homeController.status.value = AppStatus.success;
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            backgroundColor: Colors.transparent,
+                          ),
+                          child: homeController.status.value !=
+                                  AppStatus.loading
+                              ? Text(
+                                  "Remove",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .tertiary),
+                                )
+                              : Center(
+                                  child: CircularProgressIndicator(
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
+                                ));
+                    })
                   ],
                 ),
               ],

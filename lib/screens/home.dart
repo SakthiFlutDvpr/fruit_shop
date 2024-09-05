@@ -1,6 +1,5 @@
 // ignore_for_file: unused_import
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/constants/extensions.dart';
@@ -140,35 +139,6 @@ class HomeScreen extends StatelessWidget {
               },
               child: Text("Today Sales",
                   style: Theme.of(context).textTheme.bodyMedium!)),
-          PopupMenuItem(
-              padding: context.horizontalPadding(),
-              onTap: () async {
-                try {
-                  homeController.deleteStocks();
-                } catch (error) {
-                  debugPrint(error.toString());
-                }
-              },
-              child: Text("Clear All Stocks",
-                  style: Theme.of(context).textTheme.bodyMedium!)),
-          PopupMenuItem(
-              padding: context.horizontalPadding(),
-              onTap: () async {
-                await FireStoreConnection.deletingStocksHistory();
-              },
-              child: Text(
-                "Clear StocksHistory",
-                style: Theme.of(context).textTheme.bodyMedium,
-              )),
-          PopupMenuItem(
-              padding: context.horizontalPadding(),
-              onTap: () async {
-                await FireStoreConnection.deletingSalesHistory();
-              },
-              child: Text(
-                "Clear SalesHistory",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ))
         ]);
   }
 

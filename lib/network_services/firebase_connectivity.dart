@@ -28,8 +28,12 @@ class FireStoreConnection {
       Map<String, dynamic> data = (documentId.data() as Map<String, dynamic>);
       var quant = data['quantity'] + fruitCardModel.stockQuantity;
       var invest = data['investment'] + fruitCardModel.investment;
-      await documentId.reference
-          .update({'quantity': quant, 'investment': invest});
+      await documentId.reference.update({
+        'name': fruitCardModel.stockName,
+        'image': fruitCardModel.stockImage,
+        'quantity': quant,
+        'investment': invest
+      });
     } else {
       await stockCollection.doc(fruitCardModel.stockName).set({
         'name': fruitCardModel.stockName,
@@ -203,18 +207,38 @@ class FireStoreConnection {
       List<Map<String, dynamic>> salesItems) async {
     String document = DateTime.now().toString().substring(0, 10);
 
-    // DocumentSnapshot snapshot =
-    //     await salesHistoryCollection.doc(document).get();
+    DocumentSnapshot snapshot =
+        await salesHistoryCollection.doc(document).get();
 
-    // if (snapshot.exists) {
-    //   List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(
-    //       (snapshot.data() as Map<String, dynamic>)['salesItems']);
-    //   data.addAll(salesItems);
-    //   await snapshot.reference.update(
-    //       {'saleItems': data, 'date': Timestamp.fromDate(DateTime.now())});
-    // }
-    await salesHistoryCollection.doc(document).set(
-        {'saleItems': salesItems, 'date': Timestamp.fromDate(DateTime.now())});
+    if (snapshot.exists) {
+      debugPrint('update exist');
+      Map<String, dynamic> data = (snapshot.data() as Map<String, dynamic>);
+      List<dynamic> existingSaleItems = data['saleItems'];
+
+      existingSaleItems.addAll(salesItems);
+      for (var datum in existingSaleItems) {
+        debugPrint('this my entry');
+
+        debugPrint(datum.toString());
+      }
+
+      await snapshot.reference.update({
+        'saleItems': existingSaleItems,
+        'date': Timestamp.fromDate(DateTime.now())
+      });
+    } else {
+      await salesHistoryCollection.doc(document).set({
+        'saleItems': salesItems,
+        'date': Timestamp.fromDate(DateTime.now())
+      });
+
+      debugPrint("history inserted");
+      for (var datum in salesItems) {
+        debugPrint('this my entry');
+
+        debugPrint(datum.toString());
+      }
+    }
   }
 
   static Future<List<Map<String, dynamic>>> gettingSalesHistory() async {

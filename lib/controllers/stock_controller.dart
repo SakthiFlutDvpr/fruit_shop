@@ -13,7 +13,9 @@ class StockController extends GetxController {
   RxDouble todayInvestment = 0.0.obs;
 
   historyCalculation() {
+    totalInvestment.value = 0.0;
     for (var model in stockHistory) {
+      todayInvestment.value = 0;
       for (var stock in model.stocks) {
         todayInvestment.value += stock.investment;
       }

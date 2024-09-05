@@ -13,7 +13,9 @@ class SaleController extends GetxController {
   RxDouble todayEarning = 0.0.obs;
 
   historyCalculation() {
+    totalEarning.value = 0.0;
     for (var model in salesHistory) {
+      todayEarning.value = 0.0;
       for (var sale in model.sales) {
         todayEarning.value += sale.price;
       }

@@ -1,5 +1,7 @@
 // ignore_for_file: unused_import
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fruit_shop/constants/extensions.dart';
@@ -41,13 +43,27 @@ class StockDetailScreen extends StatelessWidget {
             width: 1.sw,
             height: 0.4.sh,
             child: Hero(
-              transitionOnUserGestures: true,
-              tag: controller.argument['tag'],
-              child: Image.asset(
-                controller.argument['image'],
-                fit: BoxFit.cover,
-              ),
-            ),
+                transitionOnUserGestures: true,
+                tag: controller.argument['tag'],
+                child: Image(
+                    fit: BoxFit.cover,
+                    image: FileImage(
+                      File(
+                        controller.argument['image'],
+                      ),
+                    ))
+                //  Image.asset(
+                //   controller.argument['image'],
+                //   fit: BoxFit.cover,
+                //   errorBuilder: (context, error, stackTrace) => Container(
+                //     color: Colors.grey,
+                //     child: Text(
+                //       "No Image",
+                //       style: Theme.of(context).textTheme.bodyMedium,
+                //     ),
+                //   ),
+                // ),
+                ),
           ),
           Container(
               padding: context.padding(),

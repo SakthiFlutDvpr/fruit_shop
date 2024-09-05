@@ -36,7 +36,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.primary,
         toolbarHeight: 70.h,
         foregroundColor: Colors.white,
-        title: const AppBarTitle(title: "Gafur Shop"),
+        title: const AppBarTitle(title: "Fruit Shop"),
         actions: [
           IconButton(
               onPressed: () {

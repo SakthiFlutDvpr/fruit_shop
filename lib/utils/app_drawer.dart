@@ -44,7 +44,7 @@ class AppDrawer extends StatelessWidget {
                       height: 15.h,
                     ),
                     Text(
-                      "Mohammed Sahil Gafur",
+                      "Organic Fruits",
                       style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
